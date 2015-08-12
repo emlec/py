@@ -34,13 +34,13 @@ class FastqSeq (object):
         @param qual string of quality encoded in illumina 1.8+ phred +33, or ndarray of int or
         list of int
         @param sampleIndex Index of the sample
-	@param molecularIndex Index used to remove PCR duplicate
+        @param molecularIndex Index used to remove PCR duplicate
         """
 
         self.sampleName = sampleName
         self.seq = seq
         self.sampleIndex = sampleIndex
-	self.molecularIndex = molecularIndex
+        self.molecularIndex = molecularIndex
 
         if type(qual) == str:
             self.qual = np.array([ord(x)-33 for x in qual])
@@ -57,18 +57,16 @@ class FastqSeq (object):
         assert len(self.seq) == len(self.qual), "Sequence length and quality string length are not equal."
 
     def __repr__(self):
-
-	"""Return a quick view of datas"""
-	if len(self) > 20:
-            return "{}:{}:{} : {}...{}  {}...{}".format(self.sampleName, self.sampleIndex, self.molecularIndex, self.seq[:10], self.seq[-10:], self.qual[:10], self.qual[-10:])
+        """Return a quick view of datas"""
+        if len(self) > 20:
+            return "Seq:{}\tSample index: {}\tMolecular index: {}\nSeq: {}...{}\nQual: {}...{}".format(self.sampleName, self.sampleIndex, self.molecularIndex, self.seq[:10], self.seq[-10:], self.qual[:10], self.qual[-10:])
         else:
-            return "{}:{}:{} : {}  {}".format(self.sampleName, self.sampleIndex, self.molecularIndex, self.seq, self.qual)
+            return "Seq:{}\tSample index: {}\tMolecular index: {}\nSeq: {}\nQual: {}".format(self.sampleName, self.sampleIndex, self.molecularIndex, self.seq, self.qual)
 
     def __str__(self):
+        """Return string formated as a fastq sequence"""
+        return "@{}:{}:{}\n{}\n+\n{}\n".format(self.sampleName, self.sampleIndex, self.molecularIndex, self.seq, self.qualstr)
 
- 	"""Return string formated as a fastq sequence"""
-	return "@{}:{}:{}\n {}\n{}\n+\n{}\n".format(self.sampleName, self.sampleIndex, self.molecularIndex, self.seq, self.qualstr)
-        
 
     #~~~~~~~PROPERTIES~~~~~~~#
 

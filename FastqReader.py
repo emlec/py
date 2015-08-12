@@ -21,59 +21,59 @@ import os
 from FastqSeq import FastqSeq
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
-class FastqReader (object):
+class FastqReader(object):
+    """Generator"""
    
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
 
 #~~~~~~~FUNDAMENTAL METHODS~~~~~~~#
 
-    def __init__ (self, fastq_file):
+    def __init__(self, fastq_file):
         """
         @param fastq_file
         Check if fastq_file is readable
         """
-        #if not os.path.exists(fastq_file):
-         #   raise FileNotFoundError('%s: file not found' % fastq_file)
-        #elif not os.access(fastq_file, os.R_OK):
-        #    raise FileNotReadableError('%s: file not readable' % fastq_file)
-		
+        assert os.path.exists(fastq_file), '{}: file not found'.format(fastq_file)
+        assert os.access(fastq_file, os.R_OK), '{}: file not readable'.format(fastq_file)
+                
         self.n_seq = 0
         self.fastq_file = fastq_file
-			
-	
+    
+    def __str__(self):
+        return ("Fastq File: {}\nNumber of Sequence read: {}".format(self.fastq_file, self.n_seq))
         
-		
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
 # FUNCTIONS
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
 
 
-
-    def __call__():
+    def __call__(self):
         """ Simple fastq reader returning a generator over a fastq file """
         try:
 
-			# Open the file depending of the compression status
+            # Open the file depending of the compression status
             fastq = gopen(self.fastq_file, "rb") if self.fastq_file[-2:] == "gz" else open(self.fastq_file, "rb")
-			
+            
 
-			# Iterate on the file until the end
+            # Iterate on the file until the end
             while True:
-	
-				# Extract informations from the fastq file
+    
+                # Extract informations from the fastq file
                 name, seq, sep, qual = next(fastq), next(fastq), next(fastq), next(fastq)
-
-				# Try to generate a valid FastqSeq object
+                
+                split_name = name.split(":")
+                
+                # Try to generate a valid FastqSeq object
                 try:
                     yield FastqSeq(
-					sampleName =  ":".join(name.split(":")[0:-2]),
-					seq = seq.rstrip(),
-					qual = qual.rstrip(),
-					sampleIndex = name.split(":")[-2],
-					molecularIndex = name.split(":")[-1])
-
-                #self.n_seq += 1
-					
+                    sampleName =  ":".join(split_name[0:-2])[1:],
+                    seq = seq.rstrip(),
+                    qual = qual.rstrip(),
+                    sampleIndex = split_name[-2].rstrip(),
+                    molecularIndex = split_name[-1].rstrip())
+                
+                    self.n_seq += 1
+                 
                 except AssertionError as E:
                     print(E)
                     print ("Skipping the sequence")
